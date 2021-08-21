@@ -9,15 +9,11 @@ const loggerMiddleware = ({ dispatch, getState }) => next => action => {
     return next(action)
 }
 
-const store = () => {
-    const sagaMiddleWare = createSagaMiddleware()
+const sagaMiddleWare = createSagaMiddleware()
+const middlewares = [sagaMiddleWare, loggerMiddleware] // 미들웨어 추가시..
+const enhance = composeWithDevTools(compose(applyMiddleware(...middlewares)))
 
-    const middlewares = [sagaMiddleWare, loggerMiddleware] // 미들웨어 추가시..
-    const enhangcer = composeWithDevTools(compose(applyMiddleware(...middlewares)))
-    let create = createStore(rootReducer, enhangcer)
-    create.sagaTask = sagaMiddleWare.run(rootSaga)
-
-    return create
-}
+const store = createStore(rootReducer, enhance)
+sagaMiddleWare.run(rootSaga)
 
 export default store;
